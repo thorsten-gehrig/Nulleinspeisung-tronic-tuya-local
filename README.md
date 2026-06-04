@@ -5,7 +5,7 @@ Für diese Steuerung wird https://github.com/Maztah/tronic-speicher-tuya-local v
 Es wird ein Tasmota IR-Auge (e.g. Hichi) zur Ermittlung des aktuellen Strombezugs (bedarfs) benötigt. Dieser wird mittels Helfer / Linearer Durchschnitt (Stichprobe 200, maximalalter 5min) normalisiert als sensor.lesekopf_2_min_mittelwert_stromzahler
 
 Die Steuerung versucht einen Batteriespeicher zu zu regeln das
-a) nur Tagsüber (nach Sonnenaufgang und vor Sonnenuntergang) alle 2 minuten angepasst wird
+a) nur Tagsüber (nach Sonnenaufgang und vor Sonnenuntergang) und wenn der SoC >5% ist - alle 2 minuten angepasst wird
 b) bei Einspeisung wird der Akku auf 80W und "zuerst Laden" gestellt. Das verhindert das der Akku Leistung abgibt
 c) zwischen 80-120 Watt "Bedarf" wird nicht regegelt
 d) bei Einpeisung wird ein "step down" gemacht - in 50W schritten (und vielfachen)
