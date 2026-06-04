@@ -1,0 +1,97 @@
+alias: Nulleinspeisung / Einspeiseregelung
+description: >
+  powermeter = zusätzlicher Bedarf (Netzbezug) <80W -> Step-Down Wenn Step-Down
+  <=100 ergeben würde:
+    - Modus auf "Laden zuerst"
+    - Wert 80 schreiben
+  >120W -> Step-Up 
+  80-120W -> halten (Hysterese) Bei result >100 -> Modus "Laden und Entladen"
+  Helfer muss angelegt werden (Linearisierter Durchschnitt des Strombezugs): sensor.lesekopf_2_min_mittelwert_stromzahler
+triggers:
+  - trigger: time_pattern
+    minutes: /2
+conditions:
+  - condition: or
+    conditions:
+      - condition: numeric_state
+        entity_id: sensor.solarkraftwerk_batteriestand
+        above: 5
+      - condition: sun
+        after: sunrise
+        before: sunset
+actions:
+  - variables:
+      base: 10
+      min_preset: 80
+      max_preset: 800
+      step_up: 100
+      step_down: 50
+      lower_threshold: 80
+      upper_threshold: 120
+      powermeter: >
+        {{ states('sensor.lesekopf_2_min_mittelwert_stromzahler') |
+        int(0) }}
+      actual_preset: |
+        {{ states('number.solarkraftwerk_entladeleistung_slot_1') | int(0) }}
+      actual_mode: |
+        {{ states('select.solarkraftwerk_betriebsmodus') }}
+      new_preset: |
+        {% set result = actual_preset %}
+        {% if powermeter < lower_threshold %}
+          {% set delta_down = lower_threshold - powermeter %}
+          {% set steps_down = ((delta_down - 1) // step_down) + 1 %}
+
+          {% if actual_preset > 100 %}
+            {% set raw = actual_preset - (steps_down * step_down) %}
+            {% if raw <= 100 %}
+              {% set result = min_preset %}
+            {% else %}
+              {% set result = (raw // base) * base %}
+            {% endif %}
+          {% else %}
+            {% set result = min_preset %}
+          {% endif %}
+
+        {% elif powermeter > upper_threshold %}
+          {% set delta_up = powermeter - upper_threshold %}
+          {% set steps_up = ((delta_up - 1) // step_up) + 1 %}
+          {% set raw = actual_preset + (steps_up * step_up) %}
+
+          {% if raw > max_preset %}
+            {% set result = max_preset %}
+          {% else %}
+            {% set result = (raw // base) * base %}
+          {% endif %}
+        {% endif %}
+        {{ result }}
+  - variables:
+      target_mode: >
+        {% if powermeter < lower_threshold and (new_preset | int) == min_preset
+        %}
+          Laden zuerst
+        {% elif (new_preset | int) > 100 %}
+          Laden und Entladen
+        {% else %}
+          
+        {% endif %}
+  - if:
+      - condition: template
+        value_template: |
+          {{ target_mode | trim != '' and target_mode | trim != actual_mode }}
+    then:
+      - action: select.select_option
+        target:
+          entity_id: select.solarkraftwerk_betriebsmodus
+        data:
+          option: "{{ target_mode | trim }}"
+  - if:
+      - condition: template
+        value_template: |
+          {{ (new_preset | int) != actual_preset }}
+    then:
+      - action: number.set_value
+        target:
+          entity_id: number.solarkraftwerk_entladeleistung_slot_1
+        data:
+          value: "{{ new_preset | int }}"
+mode: single
