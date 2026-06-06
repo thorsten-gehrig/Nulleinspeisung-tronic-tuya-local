@@ -10,6 +10,10 @@ description: >
 triggers:
   - trigger: time_pattern
     minutes: /2
+  - trigger: numeric_state
+    entity_id:
+      - sensor.lesekopf_2_min_mittelwert_stromzahler
+    below: -100
 conditions:
   - condition: or
     conditions:
