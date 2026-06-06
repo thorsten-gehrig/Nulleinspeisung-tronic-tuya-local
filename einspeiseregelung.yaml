@@ -4,9 +4,9 @@ description: >
   <=100 ergeben würde:
     - Modus auf "Laden zuerst"
     - Wert 80 schreiben
-  >120W -> Step-Up 
-  80-120W -> halten (Hysterese) Bei result >100 -> Modus "Laden und Entladen"
-  Helfer muss angelegt werden (Linearisierter Durchschnitt des Strombezugs): sensor.lesekopf_2_min_mittelwert_stromzahler
+  >120W -> Step-Up  80-120W -> halten (Hysterese) Bei result >100 -> Modus
+  "Laden und Entladen" Helfer muss angelegt werden (Linearisierter Durchschnitt
+  des Strombezugs): sensor.lesekopf_2_min_mittelwert_stromzahler
 triggers:
   - trigger: time_pattern
     minutes: /2
