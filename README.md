@@ -31,7 +31,7 @@ Die Logik basiert auf einem gemessenen Leistungswert (`powermeter`) und arbeitet
 ## Voraussetzungen
 
 Als Vorrausetzung für den Tronic / Lidl speicher habe ich Tuya-Local mit der Anpassung von https://github.com/Maztah/tronic-speicher-tuya-local verwendet.
-Der Netzbezug muss gemessen werden (Shelly oder Hichi o.ä.). Dieser wird mittels Helfer => statistik / Durchschnitt (Stichprobe 100, maximal-alter 5min) normalisiert als `sensor. lesekopf_2_min_mittelwert_stromzahler` verwendet.
+Der Netzbezug muss gemessen werden (Shelly oder Hichi o.ä.). Dieser wird mittels Helfer => statistik / Durchschnitt (Stichprobe 30, maximal-alter 5min) normalisiert als `sensor. lesekopf_2_min_mittelwert_stromzahler` verwendet.
 
 Zusätzlich müssen folgende Entitäten in Home Assistant vorhanden sein und ggf. an deine Umgebung angepasst werden:
 
